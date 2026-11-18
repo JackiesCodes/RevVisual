@@ -85,7 +85,7 @@ const FAQ = [
   },
   {
     q: "How accurate is it?",
-    a: "RevVisual uses AI models that run on your device to read text, cut out people and products, and fill in the background behind them. In our tests it reads about 95–98% of text lines, including text over photos, cuts out people and products with clean edges, and matches the font in most cases from a library of 22 popular typefaces. Very stylised or handwritten lettering, fonts outside that library, and small logos on busy photos are the hardest cases, so you may still adjust a few things in the editor. The first breakdown downloads the models (about 75 MB) once; on computers with a modern graphics chip they run in a few seconds.",
+    a: "RevVisual uses AI models that run on your device to read text, cut out people and products, and fill in the background behind them. In our tests it reads about 95–98% of text lines, including text over photos, cuts out people and products with clean edges, and matches the font in most cases from a library of 22 popular typefaces. Very stylised or handwritten lettering, fonts outside that library, and small logos on busy photos are the hardest cases, so you may still adjust a few things in the editor. The first breakdown downloads the models (about 45 MB) once; on computers with a modern graphics chip they run in a few seconds.",
   },
   {
     q: "Does it work on videos?",

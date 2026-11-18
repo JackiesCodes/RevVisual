@@ -28,6 +28,7 @@ const OBJECT_SYNONYMS: [RegExp, (kind: string, label: string) => boolean, string
   [/\bicons?\b/, (k) => k === "icon", "Icons"],
   [/\bproducts?\b/, (k) => k === "product", "Products"],
   [/\b(vehicle|car|bike|truck)s?\b/, (k) => k === "vehicle", "Vehicles"],
+  [/\b(animal|pet|dog|cat|bird)s?\b/, (k) => k === "animal", "Animals"],
   [/\b(building|architecture|stadium)s?\b/, (k) => k === "building", "Buildings"],
   [/\b(image|images|object|objects|asset|assets|cut ?outs?|pngs?)\b/, () => true, "All image assets"],
 ];

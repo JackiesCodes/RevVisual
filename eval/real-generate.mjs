@@ -20,7 +20,7 @@ if (!KIT) throw new Error("Set REALKIT to the folder with subj-*.png and bg-*.jp
 const OUT = path.join(import.meta.dirname, "fixtures-real");
 fs.mkdirSync(OUT, { recursive: true });
 
-const kindOf = (name) => (/girl|person|astronaut/.test(name) ? "person" : /car|coffee|product|shoe/.test(name) ? "product" : "object");
+const kindOf = (name) => (/girl|person|astronaut/.test(name) ? "person" : /car/.test(name) ? "vehicle" : /animal|chelsea|cat|dog/.test(name) ? "animal" : "product");
 const dataUrl = (f, type) => `data:${type};base64,${fs.readFileSync(path.join(KIT, f)).toString("base64")}`;
 const subjects = fs
   .readdirSync(KIT)
@@ -42,6 +42,7 @@ for (let i = 0; i < COUNT; i++) {
   const others = backgrounds.filter((b) => b !== `bg-${subject.name}.jpg`);
   const bg = others[Math.floor(rnd() * others.length)];
   const themeKey = subject.kind === "person" ? (rnd() < 0.5 ? "sports" : "event") : rnd() < 0.5 ? "product" : "sale";
+  // (Animals and vehicles get product/sale themes too, as in pet or car ads.)
   const P = buildPoster(i, { real: { subject, bg: dataUrl(bg, "image/jpeg") }, themeKey });
   const page = await browser.newPage({ viewport: { width: P.fmt.w, height: P.fmt.h }, deviceScaleFactor: 1 });
   await page.setContent(posterHTML(P), { waitUntil: "load" });

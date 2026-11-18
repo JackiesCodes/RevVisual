@@ -43,6 +43,7 @@ export type ObjectKind =
   | "face"
   | "product"
   | "vehicle"
+  | "animal"
   | "building"
   | "object"
   | "logo"

@@ -50,7 +50,7 @@ Return ONLY a JSON object, no prose, matching exactly:
   "designType": {"label": string, "confidence": number 0..1},
   "categories": [{"label": string, "confidence": number}],  // up to 4 alternatives, e.g. "Sports Poster", "Marketing Banner", "Product Advertisement", "Event Flyer", "Infographic", "Magazine Page", "Technical Diagram", "Social Media Graphic", "Visual Artwork"
   "texts": [{"text": string, "role": "headline"|"subheadline"|"caption"|"statistic"|"score"|"date"|"name"|"cta"|"body", "box": [x,y,w,h], "fontFamily": string (closest Google Font), "fontWeight": number 100..900, "color": "#RRGGBB"}],
-  "objects": [{"kind": "person"|"face"|"product"|"vehicle"|"building"|"object"|"logo"|"icon", "label": string (specific, e.g. "Player", "Team badge", "Sponsor logo", "Sneaker"), "box": [x,y,w,h], "confidence": number 0..1}],
+  "objects": [{"kind": "person"|"face"|"product"|"vehicle"|"animal"|"building"|"object"|"logo"|"icon", "label": string (specific, e.g. "Player", "Team badge", "Sponsor logo", "Sneaker"), "box": [x,y,w,h], "confidence": number 0..1}],
   "notes": string
 }
 All boxes are normalised to the image: x,y = top-left corner, w,h = size, each 0..1.

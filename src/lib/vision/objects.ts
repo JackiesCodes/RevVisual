@@ -8,7 +8,7 @@ import { matteAt, type Matte } from "./ml";
 import { isSkin, mergeNearby, type Segmentation } from "./segment";
 
 const AD_HINT = /\b(shop|buy|order|price|sale|new|drop|launch|only|offer|deal|now)\b|[$€£]|\bR\s?\d/i;
-const SPORT_HINT = /\b(vs|v\.|match|fc|cup|league|final|goal|derby|champions?|game ?day|season|tournament|united|city|rugby|soccer|football|basketball|cricket|tennis|boxing|race|marathon|stadium|kick ?off)\b/i;
+export const SPORT_HINT = /\b(vs|v\.|match|fc|cup|league|final|goal|derby|champions?|game ?day|season|tournament|united|city|rugby|soccer|football|basketball|cricket|tennis|boxing|race|marathon|stadium|kick ?off)\b/i;
 
 export function proposeObjects(
   seg: Segmentation,

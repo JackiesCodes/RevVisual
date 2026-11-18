@@ -2,15 +2,20 @@
 //  - ISNet (DIS, Apache-2.0): salient-object matte for cut-outs.
 //  - MI-GAN (Picsart, MIT): inpainting for the background plate.
 //  - PP-OCRv4 detection + recognition (PaddleOCR, Apache-2.0): text (paddle.ts).
+//  - MobileNetV2 (ONNX Model Zoo, Apache-2.0) and Ultra-Light face detector
+//    (MIT): what a photographic subject is (subjects.ts).
 // Everything degrades to the classical pipeline when the models can't load.
 import { colorDistance, kmeans, type RGB } from "../color";
+import { patchFill } from "./patchfill";
 import { makeCanvas, release } from "./raster";
 
 export const MODELS = {
-  matte: { url: "/models/isnet-general-q8.onnx", size: 1024, mb: 47 },
-  inpaint: { url: "/models/migan-fp16.onnx", size: 512, mb: 13 },
-  textDet: { url: "/models/ppocrv4-det.onnx", size: 0, mb: 5 },
-  textRec: { url: "/models/ppocrv4-rec.onnx", size: 0, mb: 11 },
+  matte: { url: "/models/isnet-general-q4.onnx", size: 1024, mb: 28 },
+  inpaint: { url: "/models/migan-q8.onnx", size: 512, mb: 7 },
+  textDet: { url: "/models/ppocrv4-det-q8.onnx", size: 0, mb: 1.4 },
+  textRec: { url: "/models/ppocrv4-rec-q8.onnx", size: 0, mb: 2.9 },
+  classify: { url: "/models/mobilenetv2-q8.onnx", size: 224, mb: 3.7 },
+  face: { url: "/models/face-rfb320.onnx", size: 320, mb: 1.3 },
 } as const;
 export type ModelName = keyof typeof MODELS;
 
@@ -199,9 +204,14 @@ export async function inpaint(ctx: CanvasRenderingContext2D, hole: Uint8Array, o
     let fill = back.ctx.getImageData(0, 0, s, s).data;
     const cur = ctx.getImageData(x, y, s, s);
     // On large holes the model sometimes invents an object in colours found
-    // nowhere around the hole. Then a smooth fill from the surroundings is
-    // the safer result (the object layer usually covers it anyway).
-    if (invented(cur.data, fill, hole, x, y, s, W)) fill = smoothFill(cur.data, hole, x, y, s, W);
+    // nowhere around the hole. Then the hole is rebuilt from real texture
+    // around it instead (content-aware fill), or a smooth blend as a last resort.
+    if (invented(cur.data, fill, hole, x, y, s, W)) {
+      const local = new Uint8Array(s * s);
+      for (let yy = 0; yy < s; yy++) for (let xx = 0; xx < s; xx++) local[yy * s + xx] = hole[(y + yy) * W + x + xx];
+      const copied = patchFill(cur.data, local, s);
+      fill = copied ? new Uint8ClampedArray(copied) : smoothFill(cur.data, hole, x, y, s, W);
+    }
     for (let yy = 0; yy < s; yy++)
       for (let xx = 0; xx < s; xx++) {
         const g = (y + yy) * W + x + xx;

@@ -76,7 +76,7 @@ function useAssetDownload(project: Project) {
   };
 }
 
-const KIND_ORDER = ["person", "face", "logo", "product", "vehicle", "building", "icon", "object"];
+const KIND_ORDER = ["person", "face", "logo", "product", "vehicle", "animal", "building", "icon", "object"];
 
 function ElementsTab({ project }: { project: Project }) {
   const { highlight, highlightIds } = useEditor();

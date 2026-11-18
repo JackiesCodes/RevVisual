@@ -21,9 +21,10 @@ import { analyzeLayout } from "./layout";
 import { matchFonts } from "./fonts";
 import { findGraphics, type GraphicsMap } from "./graphics";
 import { disableMl, loadModel, matte as runMatte, matteAt, matteGrid, mlSupported, type Matte } from "./ml";
-import { cutout, proposeObjects } from "./objects";
+import { cutout, proposeObjects, SPORT_HINT } from "./objects";
 import { runPaddleOcr } from "./paddle";
 import { aiPlate } from "./plate";
+import { classifySubjects } from "./subjects";
 import { boxIoU, loadImage, makeCanvas, nextFrame, rasterize, release, sampleColors, scaleBox } from "./raster";
 import { buildScene } from "./reconstruct";
 import { segment, withMatte } from "./segment";
@@ -262,6 +263,13 @@ export async function runPipeline(src: string, opt: PipelineOptions): Promise<Pi
     opt.onProgress?.("cutouts", (i + 1) / objects.length);
     if (i % 3 === 2) await nextFrame();
   }
+  // Name photographic subjects (person, animal, vehicle, product) from their cut-outs.
+  if (useAiImage && aiMatte)
+    try {
+      await classifySubjects(objects, W, H, SPORT_HINT.test(texts.map((t) => t.text).join(" ")));
+    } catch (e) {
+      console.warn("[ai] subject classifier unavailable", e);
+    }
   opt.onStep("cutouts", "done", `${objects.length} PNGs`);
 
   // ---- background
@@ -369,7 +377,7 @@ async function callCloud(img: HTMLImageElement) {
 }
 
 const ROLES: TextRole[] = ["headline", "subheadline", "caption", "statistic", "score", "date", "name", "cta", "body"];
-const KINDS: ObjectKind[] = ["person", "face", "product", "vehicle", "building", "object", "logo", "icon"];
+const KINDS: ObjectKind[] = ["person", "face", "product", "vehicle", "animal", "building", "object", "logo", "icon"];
 
 const denorm = (b: [number, number, number, number], W: number, H: number) => ({
   x: Math.round(b[0] * W),

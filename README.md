@@ -93,15 +93,19 @@ services/vision/        FastAPI reference service: YOLO detection → SAM masks 
 
 ### On-device AI models
 
-All models are self-hosted in `public/models` and run in the browser in a worker (`public/ml-worker.mjs`) with ONNX Runtime Web: WebGPU when available, otherwise multi-threaded WASM (the site sends cross-origin isolation headers for threads). They download once (about 75 MB) and are cached. If they can't load, the classical pipeline below runs instead; users can switch them off in Settings.
+All models are self-hosted in `public/models` and run in the browser in a worker (`public/ml-worker.mjs`) with ONNX Runtime Web: WebGPU when available, otherwise multi-threaded WASM (the site sends cross-origin isolation headers for threads). They download once (about 45 MB) and are cached. If they can't load, the classical pipeline below runs instead; users can switch them off in Settings.
 
 | Model | Use | Licence | File |
 | --- | --- | --- | --- |
-| ISNet (DIS, general use) | Foreground matte for cut-outs | Apache-2.0 | `isnet-general-q8.onnx` (weights stored as int8, computed in float) |
-| MI-GAN | Background inpainting | MIT | `migan-fp16.onnx` (weights stored as fp16) |
-| PP-OCRv4 det + rec (PaddleOCR, via RapidOCR) | Text detection and reading | Apache-2.0 | `ppocrv4-det.onnx`, `ppocrv4-rec.onnx`, `ppocrv4-rec-keys.json` |
+| ISNet (DIS, general use) | Foreground matte for cut-outs | Apache-2.0 | `isnet-general-q4.onnx` |
+| MI-GAN | Background inpainting (large holes fall back to a PatchMatch texture fill, `patchfill.ts`) | MIT | `migan-q8.onnx` |
+| PP-OCRv4 det + rec (PaddleOCR, via RapidOCR) | Text detection and reading | Apache-2.0 | `ppocrv4-det-q8.onnx`, `ppocrv4-rec-q8.onnx`, `ppocrv4-rec-keys.json` |
+| MobileNetV2 (ONNX Model Zoo) | Names photo subjects: person, animal, vehicle, product | Apache-2.0 | `mobilenetv2-q8.onnx`, `imagenet-classes.json` |
+| Ultra-Light face detector (RFB-320) | Finds people among photo subjects | MIT | `face-rfb320.onnx` |
 
-`vision/ml.ts` is the client; `paddle.ts` (text), `plate.ts` (background), `graphics.ts` (crisp flat graphics on any background) and `fonts.ts` (font matching) use it. Fonts come from Fontsource (SIL Open Font License) via `scripts/copy-font-assets.mjs`.
+Weights are stored compressed (4-bit in groups of 32 for ISNet, 8-bit per channel for the others) behind Cast/Mul nodes that ONNX Runtime folds once at load, so inference runs in float32. On the test sets this matches the full-precision models (cut-out masks 99.5% identical, text recall unchanged).
+
+`vision/ml.ts` is the client; `paddle.ts` (text), `plate.ts` (background), `subjects.ts` (what photo subjects are), `graphics.ts` (crisp flat graphics on any background) and `fonts.ts` (font matching) use it. Fonts come from Fontsource (SIL Open Font License) via `scripts/copy-font-assets.mjs`.
 
 ### How detection works without cloud models
 
