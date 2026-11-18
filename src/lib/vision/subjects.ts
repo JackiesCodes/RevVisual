@@ -73,11 +73,13 @@ export async function classifySubjects(objects: DetectedObject[], imgW: number, 
       o.kind = "person";
       o.label = sporty ? "Player" : "Person";
       o.confidence = round2(Math.max(face, Math.min(0.9, cloth + 0.4)));
-    } else if (was === "person" || was === "object") {
+    } else if (p[top] > 0.5 && (was === "object" || was === "product")) {
+      // A confidently recognised thing (a cup, a shoe): name it. Anything
+      // less certain, such as an illustrated person, keeps its earlier type.
       o.kind = "product";
       o.label = title(cls.names[top]);
       o.confidence = round2(p[top]);
-    } else if (was === "product") o.label = title(cls.names[top]);
+    } else continue;
     if (was === "person" && o.kind !== "person") notPeople.push(o);
     o.source = "ai";
   }
